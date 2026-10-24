@@ -12,6 +12,13 @@ window.DC = {
     bookingHeaders: {},                 // e.g. { apikey: '...', Authorization: 'Bearer ...' }
     busyEndpoint: '',                   // GET -> JSON [{date:'2026-10-25', time:'18:30'}, ...] of already booked slots
     leadEndpoint: '',                   // POST target for chat visitors' details {name, phone, people, lang}. '' = demo mode
+    // AI chat (Google Gemini). Leave BOTH empty = the old keyword bot is used.
+    //  geminiProxy : (recommended for a live site) URL of your own tiny server that holds the key – see worker/gemini-proxy.js
+    //  geminiKey   : paste the key here ONLY for local testing. On a public site anyone can read it from the browser,
+    //                so restrict it to your domain in Google AI Studio (HTTP referrers) or use geminiProxy.
+    geminiKey: '',
+    geminiProxy: 'https://dbzqejwsivgndftfnezb.supabase.co/functions/v1/dental-chat',   // Supabase Edge Function (project nosoq): the key lives in its GEMINI_API_KEY secret
+    geminiModel: 'gemini-2.5-flash',    // fast + understands images and video
     // appointment system
     openHour: 9, closeHour: 21,         // clinic hours (24h)
     slotMinutes: 30,                    // length of one slot

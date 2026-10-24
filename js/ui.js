@@ -9,21 +9,33 @@
     var els = $$('[data-reveal],.reveal');
     if (!hasGsap || reduce) { els.forEach(function (e) { e.classList.add('in'); }); return; }
     // geometry based (IntersectionObserver ignores clip-path hidden elements)
-    ScrollTrigger.batch(els, { start: 'top 90%', once: true,
-      onEnter: function (batch) { batch.forEach(function (e) { e.classList.add('in'); }); } });
+    // plays when it enters from below and plays BACKWARDS when you scroll back up past it
+    ScrollTrigger.batch(els, { start: 'top 90%',
+      onEnter: function (batch) { batch.forEach(function (e) { e.classList.add('in'); }); },
+      onLeaveBack: function (batch) { batch.forEach(function (e) { e.classList.remove('in'); }); } });
   }
 
   // count-up
   function initCounters() {
     var els = $$('[data-count]');
+    var tweens = new Map();
     function run(el) {
       var end = +el.dataset.count, suf = el.dataset.suffix || '', o = { v: 0 };
       var fmt = function (n) { return Math.round(n).toLocaleString('en-US') + suf; };
-      if (hasGsap && !reduce) gsap.to(o, { v: end, duration: 1.8, ease: 'power2.out', onUpdate: function () { el.textContent = fmt(o.v); } });
+      if (hasGsap && !reduce) { if (tweens.has(el)) tweens.get(el).kill(); tweens.set(el, gsap.to(o, { v: end, duration: 1.8, ease: 'power2.out', onUpdate: function () { el.textContent = fmt(o.v); } })); }
       else el.textContent = fmt(end);
     }
     if (!('IntersectionObserver' in window)) { els.forEach(run); return; }
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }); }, { threshold: .6 });
+    function reset(el) {
+      if (tweens.has(el)) { tweens.get(el).kill(); tweens.delete(el); }
+      el.textContent = '0' + (el.dataset.suffix || '');
+    }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) run(e.target);
+        else if (!reduce && e.boundingClientRect.top > 0) reset(e.target);   // left through the bottom = scrolled back up
+      });
+    }, { threshold: .6 });
     els.forEach(function (e) { io.observe(e); });
   }
 

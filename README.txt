@@ -6,7 +6,7 @@ Run:  open the folder with a local server (VS Code "Live Server", or: python3 -m
 Folder layout (flat: no folder contains another folder, every folder has fewer than 40 items)
   index.html
   css/       12 style files, loaded in numbered order (01-base ... 14-chat)
-  js/        config.js (edit per client), core.js, frames.js, scroll.js, ui.js, booking.js, chat.js, main.js
+  js/        config.js (edit per client), core.js, frames.js, scroll.js, ui.js, booking.js, gemini.js, chat.js, main.js
   lang/      en.js, ar.js (site texts)  +  chat-en.js, chat-ar.js (chat assistant answers)
   img/       doctor.jpg          certs/   ada, dental, completion (.webp)
   hero-01 ... hero-09       313 frames (35 per folder)
@@ -29,6 +29,13 @@ Site chat (NEW)
   Details are POSTed as JSON to CONFIG.leadEndpoint (empty = demo mode, nothing is sent) and also fire a "lead" event on document;
   every message fires a "chatmessage" event on document. Replace the keyword bot with an AI/API later by editing ask() in js/chat.js.
   Chat history is not stored on a server, only the visitor's details are kept in their browser.
+
+AI chat (Gemini)  <- NEW
+  Files: js/gemini.js (the AI), js/chat.js, lang/clinic-info.js (extra clinic facts you write), worker/gemini-proxy.js (hides the key)
+  Turn on: js/config.js -> geminiProxy (recommended) or geminiKey (testing only). Both empty = old keyword bot.
+  The AI reads every text on the site automatically (services, offers, hours, FAQ, doctor, certificates...) + lang/clinic-info.js.
+  Visitors can attach a photo / video (or paste a screenshot). Chips and the offline fallback still use lang/chat-*.js.
+  Scroll animations now play in reverse when you scroll back up (js/ui.js).
 
 Swapping a video
   ffmpeg -i video.mp4 -fps_mode passthrough -c:v libwebp -quality 85 -start_number 1 frames_%06d.webp

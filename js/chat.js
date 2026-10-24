@@ -1,11 +1,13 @@
 /* Site chat: the visitor leaves their details first, then asks questions and the assistant answers.
-   Answers come from lang/chat-en.js and lang/chat-ar.js (no server needed).
+   Typed questions and photos/videos go to Gemini (js/gemini.js) when CONFIG.geminiKey or geminiProxy is set;
+   quick-reply chips and the fallback use the instant answers in lang/chat-en.js and lang/chat-ar.js.
    Details are sent to CONFIG.leadEndpoint (if set) and fired as a "lead" event on document. */
 (function () {
   'use strict';
   var DC = window.DC, CONFIG = DC.CONFIG, $ = DC.$, $$ = DC.$$, t = DC.t, html = DC.html;
   var USER_KEY = 'dc_chat_user';
-  var st = { user: null, pending: null, nextIds: [], opened: false, busy: false };
+  var st = { user: null, pending: null, nextIds: [], opened: false, busy: false, hist: [], file: null, ctrl: null };
+  var AI_NEXT = ['book', 'offers', 'contact'];
   var el = {};
 
   /* ---------- matching (works for Arabic and English) ---------- */
@@ -39,9 +41,17 @@
 
   /* ---------- rendering ---------- */
   function scrollDown() { el.log.scrollTop = el.log.scrollHeight; }
-  function addMsg(who, text, actions) {
+  function mediaEl(media) {
+    var el = document.createElement(media.kind === 'video' ? 'video' : 'img');
+    el.className = 'msg-media'; el.src = media.url;
+    if (media.kind === 'video') { el.controls = true; el.muted = true; el.playsInline = true; el.preload = 'metadata'; } else el.alt = '';
+    return el;
+  }
+  function addMsg(who, text, actions, media) {
     var m = document.createElement('div'); m.className = 'msg ' + who;
+    if (media) m.appendChild(mediaEl(media));
     var b = document.createElement('div'); b.className = 'bubble'; b.textContent = text; m.appendChild(b);
+    if (!text) b.hidden = true;
     if (actions && actions.length) {
       var row = document.createElement('div'); row.className = 'msg-act';
       actions.forEach(function (a) { row.appendChild(a); }); m.appendChild(row);
@@ -84,18 +94,101 @@
   }
 
   /* ---------- conversation ---------- */
+  function localAnswer(text, forced) {
+    var e = forced || findAnswer(text), cfg = kb();
+    if (e) { addMsg('bot', e.a, actionsFor(e.act)); setChips(e.next); }
+    else { addMsg('bot', cfg.fallback, actionsFor('call')); setChips(cfg.fallbackNext); }
+  }
+  function done() { st.busy = false; el.send.disabled = false; if (el.input) el.input.focus({ preventScroll: true }); }
+
+  /* ---------- Gemini ---------- */
+  function clean(txt) {      // strip markdown the model may still add + the action tag
+    return String(txt).replace(/\[\[[a-z]*\]?\]?\s*$/i, '').replace(/\[\[[^\]]*\]\]/g, '')
+      .replace(/\*\*/g, '').replace(/^\s*[*•]\s+/gm, '- ').replace(/^#+\s*/gm, '').trim();
+  }
+  function tagOf(txt) { var m = /\[\[(book|call|directions)\]\]/i.exec(txt); return m ? m[1].toLowerCase() : null; }
+  function trimHist() {
+    // keep media only in the most recent message that has it (keeps requests small and fast)
+    var last = -1, i;
+    for (i = st.hist.length - 1; i >= 0; i--) if (st.hist[i].hasMedia) { last = i; break; }
+    st.hist.forEach(function (h, k) {
+      if (h.hasMedia && k !== last) h.parts = h.parts.filter(function (p) { return !p.inline_data; }).concat(h.parts.some(function (p) { return p.text; }) ? [] : [{ text: '(media sent earlier)' }]);
+    });
+    if (st.hist.length > 16) st.hist = st.hist.slice(-16);
+    while (st.hist.length && st.hist[0].role !== 'user') st.hist.shift();
+  }
+  function askAI(text, filePart) {
+    var parts = [];
+    if (filePart) parts.push(filePart);
+    parts.push({ text: text || t('chatMediaQ') });
+    st.hist.push({ role: 'user', parts: parts, hasMedia: !!filePart });
+    trimHist();
+    var contents = st.hist.map(function (h) { return { role: h.role, parts: h.parts }; });
+    var bubble = null, msg = null, partial = '', ctrl = new AbortController(), timer = setTimeout(function () { ctrl.abort(); }, 40000);
+    st.ctrl = ctrl;
+    DC.ai.ask(contents, st.user, function (full) {
+      partial = full; var shown = clean(full); if (!shown) return;
+      if (!msg) { typing(false); msg = addMsg('bot', shown); bubble = msg.querySelector('.bubble'); }
+      else { bubble.textContent = shown; scrollDown(); }
+    }, ctrl.signal).then(function (full) {
+      clearTimeout(timer); typing(false);
+      var shown = clean(full);
+      if (!shown) { st.hist.pop(); localAnswer(text); return; }     // blocked / empty -> instant answer
+      st.hist.push({ role: 'model', parts: [{ text: full }] });
+      if (!msg) msg = addMsg('bot', shown); else bubble.textContent = shown;
+      var tag = tagOf(full), acts = tag ? actionsFor(tag) : [];
+      if (acts.length) { var row = document.createElement('div'); row.className = 'msg-act'; acts.forEach(function (x) { row.appendChild(x); }); msg.appendChild(row); }
+      document.dispatchEvent(new CustomEvent('chatmessage', { detail: { from: 'bot', text: shown, user: st.user } }));
+      setChips(AI_NEXT); scrollDown();
+    }).catch(function () {
+      clearTimeout(timer); typing(false);
+      if (msg) { st.hist.push({ role: 'model', parts: [{ text: partial }] }); return; }   // keep what was already shown
+      st.hist.pop();
+      if (filePart) addMsg('bot', t('chatMediaErr'), actionsFor('call'));
+      else localAnswer(text);
+    }).then(done);
+  }
+
+  /* ---------- attachments ---------- */
+  function showPrev() {
+    el.prev.innerHTML = '';
+    if (!st.file) { el.prev.hidden = true; return; }
+    var box = document.createElement('div'); box.className = 'prev-item';
+    box.appendChild(mediaEl(st.file.media));
+    var x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', t('close'));
+    x.addEventListener('click', clearFile); box.appendChild(x);
+    el.prev.appendChild(box); el.prev.hidden = false; scrollDown();
+  }
+  function clearFile() {
+    if (st.file && st.file.media) URL.revokeObjectURL(st.file.media.url);
+    st.file = null; el.file.value = ''; showPrev();
+  }
+  function pickFile(f) {
+    if (!f) return;
+    DC.ai.fileToPart(f).then(function (part) {
+      if (st.file) clearFile();
+      st.file = { part: part, media: { kind: /^video\//.test(f.type) ? 'video' : 'image', url: URL.createObjectURL(f) } };
+      showPrev(); el.input.focus({ preventScroll: true });
+    }).catch(function (e) { addMsg('bot', t(e && e.message === 'big' ? 'chatMediaBig' : 'chatMediaType')); });
+  }
+
+  /* ---------- conversation ---------- */
   function ask(text, forced) {
     if (st.busy) return;
-    text = String(text).trim(); if (!text) return;
-    addMsg('user', text); el.chips.innerHTML = '';
-    var e = forced || findAnswer(text), cfg = kb();
-    st.busy = true; typing(true);
+    text = String(text).trim();
+    var file = st.file, useAI = !forced && DC.ai && DC.ai.enabled();
+    if (!text && !file) return;
+    var media = file ? file.media : null;
+    addMsg('user', text, null, media); el.chips.innerHTML = '';
+    if (file) { st.file = null; el.file.value = ''; el.prev.innerHTML = ''; el.prev.hidden = true; }   // keep the object URL: the bubble still shows it
+    st.busy = true; el.send.disabled = true; typing(true);
+    if (useAI) { askAI(text, file && file.part); return; }
+    if (forced) st.hist.push({ role: 'user', parts: [{ text: text }] });
     setTimeout(function () {
-      typing(false);
-      if (e) { addMsg('bot', e.a, actionsFor(e.act)); setChips(e.next); }
-      else { addMsg('bot', cfg.fallback, actionsFor('call')); setChips(cfg.fallbackNext); }
-      st.busy = false; if (el.input) el.input.focus({ preventScroll: true });
-    }, 520 + Math.min(500, text.length * 8));
+      typing(false); localAnswer(text, forced);
+      if (forced) { st.hist.push({ role: 'model', parts: [{ text: forced.a }] }); }
+      done();
+    }, 420);
   }
 
   function greet() {
@@ -167,6 +260,7 @@
   function init() {
     el.fab = $('#chatFab'); el.panel = $('#chat'); el.intro = $('#chatIntro'); el.body = $('#chatBody');
     el.log = $('#chatLog'); el.chips = $('#chatChips'); el.input = $('#chatInput'); el.form = $('#chatForm');
+    el.send = $('#chatSend'); el.attach = $('#chatAttach'); el.file = $('#chatFile'); el.prev = $('#chatPrev');
     if (!el.fab) return;
     try { var u = JSON.parse(localStorage.getItem(USER_KEY) || 'null'); if (u && u.name && u.phone) st.user = u; } catch (e) {}
     if (!CONFIG.whatsapp) html.classList.add('no-wa');
@@ -174,6 +268,16 @@
     $('#chatX').addEventListener('click', close);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && st.opened) close(); });
     el.form.addEventListener('submit', function (e) { e.preventDefault(); var v = el.input.value; el.input.value = ''; ask(v); });
+    var ai = !!(DC.ai && DC.ai.enabled());
+    el.attach.hidden = !ai; el.file.disabled = !ai;
+    if (ai) {
+      el.attach.addEventListener('click', function () { el.file.click(); });
+      el.file.addEventListener('change', function () { pickFile(el.file.files[0]); });
+      el.form.addEventListener('paste', function (e) {            // paste a screenshot / photo
+        var it = e.clipboardData && [].slice.call(e.clipboardData.items).filter(function (i) { return /^image\//.test(i.type); })[0];
+        if (it) pickFile(it.getAsFile());
+      });
+    }
     initIntro();
     DC.onLang.push(function () { buildPeople(); if (st.user && el.log.children.length) setChips(st.nextIds); });
     buildPeople();

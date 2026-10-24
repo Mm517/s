@@ -487,9 +487,12 @@
   <div class="chat-body" id="chatBody" hidden>
     <div class="chat-log" id="chatLog" aria-live="polite"></div>
     <div class="chat-chips" id="chatChips"></div>
+    <div class="chat-prev" id="chatPrev" hidden></div>
     <form class="chat-in" id="chatForm" autocomplete="off">
-      <input id="chatInput" maxlength="300" data-i18n-ph="chatPh" data-i18n-aria="chatPh" aria-label="Type your question">
-      <button type="submit" data-i18n-aria="chatSend" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"/></svg></button>
+      <button type="button" class="chat-attach" id="chatAttach" hidden data-i18n-aria="chatAttach" aria-label="Attach a photo or video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.500l-8.500 8.500a5.500 5.500 0 01-7.800-7.800l9-9a3.700 3.700 0 015.200 5.200l-9 9a1.800 1.800 0 01-2.600-2.600l8.300-8.300"/></svg></button>
+      <input type="file" id="chatFile" accept="image/*,video/*" hidden tabindex="-1">
+      <input id="chatInput" maxlength="500" data-i18n-ph="chatPh" data-i18n-aria="chatPh" aria-label="Type your question">
+      <button type="submit" id="chatSend" data-i18n-aria="chatSend" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"/></svg></button>
     </form>
   </div>
 </section>
@@ -501,12 +504,14 @@
 <script src="lang/ar.js"></script>
 <script src="lang/chat-en.js"></script>
 <script src="lang/chat-ar.js"></script>
+<script src="lang/clinic-info.js"></script>
 <script src="js/config.js"></script>
 <script src="js/core.js"></script>
 <script src="js/frames.js"></script>
 <script src="js/scroll.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/booking.js"></script>
+<script src="js/gemini.js"></script>
 <script src="js/chat.js"></script>
 <script src="js/main.js"></script>
 </body>

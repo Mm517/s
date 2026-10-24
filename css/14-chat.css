@@ -57,6 +57,20 @@ html[dir="rtl"] .chat{transform-origin:bottom left}
 html[dir="rtl"] .chat-in button svg{transform:scaleX(-1)}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+/* attachments */
+.chat-attach{flex:none;width:42px;height:46px;border:0;background:none;cursor:pointer;display:grid;place-items:center;border-radius:50%;color:var(--brand-deep);transition:background .2s}
+.chat-attach:hover{background:var(--tint)}
+.chat-attach[hidden]{display:none}
+.chat-attach svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chat-in input[type=text],.chat-in input#chatInput{flex:1;min-width:0}
+.chat-in button:disabled{opacity:.5;cursor:default;transform:none}
+.chat-prev{padding:8px 16px 0;background:var(--bg);flex-shrink:0}
+.chat-prev[hidden]{display:none}
+.prev-item{position:relative;display:inline-block}
+.prev-item .msg-media{width:84px;height:84px;object-fit:cover;border-radius:14px;border:1px solid var(--line);display:block}
+.prev-item button{position:absolute;top:-8px;inset-inline-end:-8px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;background:var(--brand-deep);color:#fff;font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.msg-media{max-width:100%;width:230px;max-height:230px;object-fit:cover;border-radius:16px;border:1px solid var(--line);background:#000}
+.msg.user .msg-media{border-end-end-radius:6px}
 @media (max-width:560px){
   .chat{inset-inline:8px;bottom:8px;width:auto;height:min(82dvh,640px)}
   .chat-fab span{display:none}.chat-fab{padding:15px}

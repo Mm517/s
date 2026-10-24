@@ -115,5 +115,8 @@ window.I18N.en = {
     chatPeople: 'Who is coming?', chatStart: 'Start chat', chatPrivacy: 'Your details are only used by the clinic to reply to you.',
     chatPh: 'Type your question…', chatSend: 'Send', chatClose: 'Close chat',
     chatHello: 'Hi {name}! I can answer questions about offers, booking, prices and opening hours. What would you like to know?',
-    chatActBook: 'Open the booking form', chatActCall: 'Call'
+    chatActBook: 'Open the booking form', chatActCall: 'Call',
+    chatAttach: 'Attach a photo or video', chatMediaQ: 'Please look at this and tell me what you see.',
+    chatMediaErr: 'I could not open that file right now. Please try again, or call the clinic.',
+    chatMediaBig: 'That file is too large. Please send a video under about 18 MB or a photo.', chatMediaType: 'Please attach a photo or a video.'
 };
