@@ -1,0 +1,20 @@
+/* ==========================================================
+   v3 additions: implant tour · reviews · appointment system
+   ========================================================== */
+/* ---------- tour (frame sequence #3, light section) ---------- */
+.tour{position:relative;height:480vh;background:linear-gradient(180deg,var(--bg),var(--tint) 60%,var(--bg))}
+.tour-pin{position:sticky;top:0;height:100vh;min-height:600px;display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:center;
+  padding:96px max(24px,calc((100vw - 1240px)/2)) 40px;overflow:hidden}
+.tour-copy{display:grid;gap:22px;align-content:center}
+.tour-copy h2{font-size:clamp(2.2rem,4.2vw,3.6rem);font-weight:300}
+.tour .anat-intro{color:var(--muted)}
+.tour .part{background:#fff;border-color:var(--line);backdrop-filter:none}
+.tour .part h3::before{background:var(--brand-soft)}
+.tour .part .pd p{color:var(--muted)}
+.tour .part.on{background:var(--tint);border-color:var(--brand)}
+.tour .part.on h3::before{background:var(--brand);box-shadow:0 0 0 6px rgba(19,137,240,.2)}
+.tour-card{position:relative;aspect-ratio:16/9;width:100%;border-radius:var(--r-stage);overflow:hidden;border:8px solid #fff;background:var(--tint);
+  box-shadow:0 40px 80px -24px rgba(11,76,155,.35),0 0 0 1px var(--line);will-change:transform}
+.tour-card canvas{width:100%;height:100%;object-fit:cover;}
+.tour-meta{position:absolute;inset-inline-end:16px;bottom:14px;background:rgba(255,255,255,.88);padding:6px 14px;border-radius:var(--r-pill);color:var(--muted);font-size:.75rem;font-weight:700}
+.reduce .tour{height:auto}.reduce .tour-pin{position:relative;height:auto}

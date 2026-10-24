@@ -1,0 +1,27 @@
+/* ---------- anatomy (second frame sequence) ---------- */
+.anat{position:relative;height:500vh;background:var(--ink-deep)}
+.anat-stage{position:sticky;top:0;height:100vh;min-height:560px;overflow:hidden;background:var(--ink-deep)}
+.anat-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.anat-tint{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,rgba(6,20,46,.72) 0%,rgba(6,20,46,.25) 45%,rgba(6,20,46,0) 70%),
+             radial-gradient(900px 500px at 70% 100%,rgba(19,137,240,.35),transparent 70%)}
+.anat-ui{position:absolute;inset:0;display:flex;align-items:center;padding:96px max(24px,calc((100vw - 1240px)/2)) 56px}
+.anat-panel{width:min(400px,100%);color:#fff;display:grid;gap:22px}
+.anat-panel .chip{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
+.anat-panel h2{font-size:clamp(2.2rem,4.4vw,3.8rem);font-weight:300}
+.anat-intro{color:rgba(255,255,255,.82);max-width:32ch;transition:opacity .5s,max-height .6s var(--ease);max-height:120px}
+.anat-intro.off{opacity:0;max-height:0}
+.parts{display:grid;gap:10px}
+.part{border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:14px 18px;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);
+  transition:background .5s,border-color .5s}
+.part h3{font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
+.part h3::before{content:"";width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .4s,box-shadow .4s}
+.part .pd{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease)}
+.part .pd p{overflow:hidden;color:rgba(255,255,255,.85);font-size:.92rem}
+.part.on{background:rgba(19,137,240,.3);border-color:rgba(80,170,255,.7)}
+.part.on h3::before{background:var(--brand-bright);box-shadow:0 0 0 6px rgba(61,184,255,.3)}
+.part.on .pd{grid-template-rows:1fr}
+.part.on .pd p{padding-top:8px}
+.anat-meta{position:absolute;inset-inline:max(24px,calc((100vw - 1240px)/2)) max(90px,calc((100vw - 1240px)/2 + 66px));bottom:28px;display:flex;justify-content:flex-end;color:rgba(255,255,255,.75);font-size:.78rem;font-weight:700}
+.anat-meta .prog em{background:rgba(255,255,255,.22)}
+.anat-meta .prog em span{background:var(--brand-bright)}

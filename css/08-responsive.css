@@ -1,0 +1,39 @@
+/* ---------- anatomy mobile ---------- */
+@media (max-width:980px){
+  .nav ul{display:none}.burger{display:block}
+  .nav.open ul{display:flex;position:absolute;top:66px;inset-inline:0;flex-direction:column;gap:6px;background:var(--bg);padding:18px 24px;border-radius:24px;border:1px solid var(--line)}
+  .hero-pin{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:12px;padding-top:88px;padding-bottom:24px}
+  .stage{justify-self:center;grid-row:1;height:min(44vh,420px)}
+  .copy{grid-row:2;height:100%}
+  .chapter{justify-content:flex-start;gap:14px}
+  .chapter h1{font-size:clamp(2.3rem,10vw,3.4rem)}
+  .hero-meta{display:none}
+  .services{grid-template-columns:1fr 1fr}
+  .about-grid,.book,.faq-grid{grid-template-columns:1fr;gap:36px}
+  .faq-grid h2{position:static}
+  .steps{grid-template-columns:1fr 1fr;row-gap:44px}
+  .stats{grid-template-columns:1fr}.stat{border-inline-end:0;border-bottom:1px solid rgba(255,255,255,.22)}
+  .rev-wrap{grid-template-columns:1fr}
+  .anat-stage canvas{inset:auto;top:76px;left:0;width:100%;height:auto;aspect-ratio:16/9}
+  .anat-ui{align-items:flex-end;padding-top:0}
+  .anat-tint{background:linear-gradient(0deg,rgba(6,20,46,.85) 35%,rgba(6,20,46,0) 70%)}
+  .anat-panel{gap:12px}
+  .anat-panel h2{font-size:1.9rem}
+  .parts{gap:6px}.part{padding:10px 14px}
+  .anat-meta{display:none}
+}
+@media (max-width:560px){
+  .services{grid-template-columns:1fr}.two{grid-template-columns:1fr}.steps{grid-template-columns:1fr}
+  .nav .btn-primary{display:none}
+  section.block{padding:80px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .blob,.chip i,.pl-inner svg{animation:none}
+}
+.reduce .hero,.reduce .anat{height:auto}
+.reduce .hero-pin{position:relative;height:auto;min-height:100vh}
+.reduce .anat-stage{position:relative}
+.reduce .chapter{transition:none}
+html[dir="rtl"] .anat-tint{background:linear-gradient(260deg,rgba(6,20,46,.72) 0%,rgba(6,20,46,.25) 45%,rgba(6,20,46,0) 70%),radial-gradient(900px 500px at 30% 100%,rgba(19,137,240,.35),transparent 70%)}
+@media (max-width:980px){html[dir="rtl"] .anat-tint{background:linear-gradient(0deg,rgba(6,20,46,.85) 35%,rgba(6,20,46,0) 70%)}}

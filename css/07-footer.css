@@ -1,0 +1,14 @@
+/* ---------- footer ---------- */
+footer{position:relative;background:linear-gradient(180deg,var(--brand),var(--brand-deep));color:#fff;padding:56px 0 0;overflow:hidden}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.foot ul{display:flex;gap:26px;list-style:none;font-weight:600;font-size:.92rem;flex-wrap:wrap}
+.foot ul a{opacity:.9;transition:opacity .2s}.foot ul a:hover{opacity:1;text-decoration:underline;text-underline-offset:6px}
+.foot small{opacity:.85}
+.brand.light svg{fill:#fff}.brand.light small{color:rgba(255,255,255,.8)}
+.bigword{margin-top:34px;text-align:center;font-size:clamp(3.2rem,15vw,13rem);font-weight:800;line-height:.95;color:rgba(255,255,255,.14);white-space:nowrap;user-select:none;padding-bottom:.06em}
+
+.fab{opacity:0;pointer-events:none;scale:.6;position:fixed;inset-inline-end:20px;bottom:86px;z-index:90;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;
+  background:#25D366;color:#fff;box-shadow:0 14px 30px rgba(37,211,102,.4);transition:transform .35s var(--ease),opacity .4s,scale .5s var(--ease)}
+.fab.show{opacity:1;pointer-events:auto;scale:1}
+.fab:hover{transform:scale(1.08) rotate(-6deg)}
+.fab svg{width:30px;height:30px;fill:#fff}

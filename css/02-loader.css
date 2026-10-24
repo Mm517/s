@@ -1,0 +1,21 @@
+/* ---------- preloader / curtain / progress ---------- */
+#preloader{position:fixed;inset:0;z-index:300;background:linear-gradient(160deg,var(--brand-bright),var(--brand-deep));color:#fff;display:grid;place-items:center}
+.pl-inner{display:grid;justify-items:center;gap:18px;text-align:center}
+.pl-inner svg{width:64px;height:64px;fill:#fff;animation:plfloat 1.6s ease-in-out infinite}
+@keyframes plfloat{50%{transform:translateY(-10px) rotate(-4deg)}}
+.pl-count{font-size:clamp(3rem,9vw,6rem);font-weight:300;line-height:1;font-variant-numeric:tabular-nums}
+.pl-count small{font-size:.35em;opacity:.8;margin-inline-start:4px}
+.pl-inner p{opacity:.9;font-weight:600;font-size:.95rem}
+.pl-bar{width:min(260px,60vw);height:3px;border-radius:3px;background:rgba(255,255,255,.28);overflow:hidden}
+.pl-bar i{display:block;height:100%;width:0;background:#fff}
+#curtain{position:fixed;inset:0;z-index:250;display:none;place-items:center;background:var(--brand);color:#fff;pointer-events:none}
+#curtain span{font-size:clamp(3rem,10vw,7rem);font-weight:300}
+.topbar{position:fixed;top:0;inset-inline:0;height:3px;z-index:120;background:transparent;pointer-events:none}
+.topbar i{display:block;height:100%;width:100%;background:var(--brand);transform:scaleX(0);transform-origin:left}
+html[dir="rtl"] .topbar i{transform-origin:right}
+
+/* ---------- custom cursor ---------- */
+.cursor{position:fixed;top:0;left:0;z-index:260;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;
+  border:1.5px solid var(--brand);pointer-events:none;opacity:0;transition:width .25s var(--ease),height .25s var(--ease),margin .25s var(--ease),background .25s,opacity .3s}
+.cursor.on{opacity:1}
+.cursor.hot{width:68px;height:68px;margin:-34px 0 0 -34px;background:rgba(19,137,240,.14)}
